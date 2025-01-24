@@ -26,7 +26,7 @@ const resourceGroup = new resources.ResourceGroup(`${prefixName}-rg`)
 const sanitizedPrefixName = prefixName.replace(/[^a-zA-Z0-9]/g, ""); // Remove hyphens
 
 // Create the container registry.
-const registry = new containerregistry.Registry(`${sanitizedPrefixName}ACR`, {
+const registry = new containerregistry.Registry(`${prefixName}ACR`, {
   resourceGroupName: resourceGroup.name,
   adminUserEnabled: true,
   sku: {
