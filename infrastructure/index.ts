@@ -23,7 +23,6 @@ const memory = config.requireNumber('memory')
 
 // Create a resource group.
 const resourceGroup = new resources.ResourceGroup(`${prefixName}-rg`)
-const sanitizedPrefixName = prefixName.replace(/[^a-zA-Z0-9]/g, ""); // Remove hyphens
 
 // Create the container registry.
 const registry = new containerregistry.Registry(`${prefixName}ACR`, {
@@ -92,7 +91,7 @@ const containerGroup = new containerinstance.ContainerGroup(
             },
             {
               name: 'WEATHER_API_KEY',
-              value: config.requireSecret('WEATHER_API_KEY'),
+              value: ('3dfc408958280160d5577f1a00dc7d36'),
             },
           ],
           resources: {

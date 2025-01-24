@@ -7,5 +7,3 @@ config:
   cst8918-a03-infra:memory: '2'
   cst8918-a03-infra:prefixName: 'cst8918a03brow1063'
   cst8918-a03-infra:imageTag: 'v0.2.0'
-  cst8918-a03-infra:WEATHER_API_KEY:
-    secure: AAABAMuoVi/JegmRrJ1d2WTYKxLRYlpu7OEg3zj1zmzAg7rTv/odAoZpaJF17fCF5/eGxGDk8FcmXEU9USDDMw==
