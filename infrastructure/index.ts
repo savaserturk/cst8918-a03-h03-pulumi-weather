@@ -3,6 +3,7 @@ import * as resources from '@pulumi/azure-native/resources'
 import * as containerregistry from '@pulumi/azure-native/containerregistry'
 import * as docker from '@pulumi/docker'
 import * as containerinstance from '@pulumi/azure-native/containerinstance'
+import * as cache from '@pulumi/azure-native/cache';
 
 // Import the configuration settings for the current stack.
 const config = new pulumi.Config()
@@ -60,6 +61,35 @@ const image = new docker.Image(`${prefixName}-image`, {
   },
 })
 
+// Create a managed Redis service
+const redis = new cache.Redis(`${prefixName}-redis`, {
+  name: `${prefixName}-weather-cache`,
+  location: 'westus3',
+  resourceGroupName: resourceGroup.name,
+  enableNonSslPort: true,
+  redisVersion: 'Latest',
+  minimumTlsVersion: '1.2',
+  redisConfiguration: {
+    maxmemoryPolicy: 'allkeys-lru'
+  },
+  sku: {
+    name: 'Basic',
+    family: 'C',
+    capacity: 0
+  }
+});
+
+// Extract the auth creds from the deployed Redis service
+const redisAccessKey = cache
+  .listRedisKeysOutput({ name: redis.name, resourceGroupName: resourceGroup.name })
+  .apply(keys => keys.primaryKey);
+
+// Construct the Redis connection string
+const redisConnectionString = pulumi.interpolate`rediss://:${redisAccessKey}@${redis.hostName}:${redis.sslPort}`;
+
+
+
+
 // Create a container group in the Azure Container App service and make it publicly accessible.
 const containerGroup = new containerinstance.ContainerGroup(
     `${prefixName}-container-group`,
@@ -92,6 +122,10 @@ const containerGroup = new containerinstance.ContainerGroup(
             {
               name: 'WEATHER_API_KEY',
               value: config.requireSecret('weatherApiKey')
+            },
+            {
+              name: 'REDIS_URL',
+              value: redisConnectionString
             },
           ],
           resources: {
